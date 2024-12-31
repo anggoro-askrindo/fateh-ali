@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Sesuaikan dengan database Anda
+  url      = env("DATABASE_URL")
+}
+
+// Model User
+model User {
+  id        String      @id @default(cuid())
+  username  String
+  email     String
+  password  String
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  roles     UserRole[]  // Relasi ke UserRole
+}
+
+// Model Role
+model Role {
+  name      String      @id
+  description String?
+  isActive  Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  users     UserRole[]  // Relasi ke UserRole
+}
+
+// Model UserRole
+model UserRole {
+  userId   String
+  roleName String
+  user     User      @relation(fields: [userId], references: [id])
+  role     Role      @relation(fields: [roleName], references: [name])
+
+  @@id([userId, roleName]) // Composite Primary Key
+}
